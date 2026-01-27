@@ -6,7 +6,7 @@ from typing import Dict, List
 
    
 class Product:
-    """Représente un jouet dans l'usine."""
+    """Représente un produit dans l'usine."""
 
     SERIAL_NUMBER = 0
     COLORS = ["Red", "Blue", "Green", "Yellow", "Mauve", "Orange"]
@@ -15,13 +15,15 @@ class Product:
     STATUS_IN_PROGRESS = "In_progress"
     STATUS_IN_DEFECTIVE = "Defective"
     STATUS_IN_FINISHED = "Finished"
+    STATUS_REJECTED = "Rejected"
 
     def __init__(self, logger: logging.Logger) -> None:
         Product.SERIAL_NUMBER += 1
         self.logger = logger
         self._product_color = random.choice(Product.COLORS)
         self._status = Product.STATUS_IN_CREATED
-        self._production_time = .0
+        self._production_time = 0
+        self.retry_count = 0
         self._id = f"TOY-{Product.SERIAL_NUMBER:03d}-{self._product_color.upper()}"
         self._history: List[Dict] = []
         
@@ -52,8 +54,15 @@ class Product:
     def get_history(self) -> List:
         return self._history.copy() # Retourner une copie pour éviter une modif de l'originale
     
+    def get_retry_count(self) -> int:
+        return self.retry_count
+    
     def validate_id(self) -> bool:
         return re.match(r"TOY-\d{3}-[A-Z]+", self._id) is not None
+    
+    def increment_retry(self) -> None:
+        self.retry_count += 1
+        self.logger.debug(f"Produit {self.get_id()} - Tentatives = {self.retry_count}")
     
     def mark_in_progress(self) -> None:
         self._status = Product.STATUS_IN_PROGRESS
@@ -66,6 +75,10 @@ class Product:
     def mark_finished(self) -> None:
         self._status = Product.STATUS_IN_FINISHED
         self.logger.info(f"Produit {self._id} marqué comme fini en {self._production_time}s")
+    
+    def mark_rejected(self) -> None:
+        self._status = Product.STATUS_REJECTED
+        self.logger.error(f"Produit {self.get_id()} rejecté après {self.get_retry_count()} tentatives.")
     
     def add_production_step(self, station_name: str, duration: float) -> None:
         """Ajoute une étape de production à l"historique"""
