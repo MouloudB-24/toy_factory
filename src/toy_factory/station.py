@@ -30,6 +30,7 @@ class Station:
         self.current_product = None
         self.initial_processing_time = 0.0
         self.processing_remaining_time = 0.0
+        self.total_processiong_time = 0.0
         
         # Pannes
         self.breakdown_remaining_time = 0.0
@@ -69,6 +70,7 @@ class Station:
             return finished_products
         
         if self.state == StationState.PROCESSING:
+            self.total_processiong_time += delta_time
             self.processing_remaining_time -= delta_time
             if self.processing_remaining_time <= 0:
                 finished_products.append(self.current_product)

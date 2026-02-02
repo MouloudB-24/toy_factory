@@ -27,7 +27,7 @@ class Product:
         self._id = f"TOY-{Product.SERIAL_NUMBER:03d}-{self._product_color.upper()}"
         self._history: List[Dict] = []
         
-        self.logger.info(f"Produit {self._id} créé")
+        self.logger.debug(f"Produit {self._id} créé")
 
     def __str__(self) -> str:
         return f"{self._id} (Status: {self._status} - Production-time: {self._production_time}s)"

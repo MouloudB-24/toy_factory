@@ -42,7 +42,7 @@ class DefectStack:
     
             if current_retry > 3:
                 product.mark_rejected()
-                self.logger.warning(f"Produit {self.get_id()} rejecté après {self.get_retry_count()} tentatives de correction")
+                self.logger.warning(f"Produit {product.get_id()} rejecté après {product.get_retry_count()} tentatives de correction")
                 return product, None
         self.logger.info(f"Produit {product.get_id()} envoyé en retraitement")
         return product, station

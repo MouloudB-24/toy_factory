@@ -50,6 +50,21 @@ class Factory:
         self.next_product_id = 1
         
         self.logger.info("Usine de fabrication de jouets initialisée")
+    
+    def compute_station_utilization(self) -> dict:
+        """
+        Calcule le taux d'occupation de chaque station
+        """
+        utilization = {}
+        
+        if self.simulated_time == 0:
+            return utilization
+        
+        for name, station in self.stations.items():
+            rate = station.total_processiong_time / self.simulated_time
+            utilization[name] = round(rate * 100, 2)
+        
+        return utilization
         
     def update(self, delta_time_real: float) -> None:
         """
@@ -120,7 +135,7 @@ class Factory:
             if station_name == self.station_order[-1]:
                 for product in products:
                     product.mark_finished()
-                    self.logger.info(f"Produit {product.get_id()} :  fabrication terminée (temps total : {product.get_production_time()}s)")
+                    self.logger.info(f"Produit {product.get_id()} :  fabrication terminée")
                     self.finished_products.append(product)
             
             else:
@@ -173,7 +188,7 @@ class Factory:
         
         if self.finished_products:
             total_time = reduce(lambda total, product: total + product.get_production_time(), self.finished_products, 0)
-            avg_time = total_time / len(self.finished_products)
+            avg_time = round(total_time / len(self.finished_products), 2)
             self.logger.info(f"Temps moyen de production : {avg_time} secondes/produit")
         
         repaired_products = list(filter(lambda product: product.get_retry_count() >= 1, all_products))
@@ -185,32 +200,15 @@ class Factory:
         for product_id in  last_id:
             self.logger.info(f"{product_id}")
         
+        self.logger.info("Analyse des goulots d’étranglement :")
+        utilization = self.compute_station_utilization()
+        for station, rate in utilization.items():
+            self.logger.info(f"Station {station.capitalize()} : taux d’occupation {rate} %")
+        
+        if utilization:
+            bottleneck = max(utilization, key=utilization.get)
+            self.logger.warning(f"Station {bottleneck.capitalize()} constitue le principal goulot d’étranglement du l'usine")
         
         
-
 if __name__  == "__main__":
-    import time
-    from utils.logger import config_logging
-    logger = config_logging()
-    
-    # Simule 5 secondes simulées
-    usine = Factory(logger, production_rate=0.5, time_scale=10)
-    
-    # 2. Boucle de simulation
-    sim_duration = 3  # secondes réelles
-    start_time = time.time()
-    last_tick = start_time
-    
-    while time.time() - start_time < sim_duration:
-        now = time.time()
-        # delta = now - last_tick
-        delta = 1
-        
-        # On met à jour l'usine
-        usine.update(delta)
-        
-        last_tick = now
-        time.sleep(0.1) # Petite pause pour laisser respirer le processeur
-    
-    # 3. Le moment de vérité !
-    usine.generate_report()
+    pass
