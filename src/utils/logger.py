@@ -2,12 +2,10 @@ import logging
 
 
 def config_logging(
-    filename: str = "factory.log",
-    console_level: int = logging.INFO,
-    file_level: int = logging.DEBUG,
-) -> logging.Logger:
+    filename: str = "factory.log", console_level: int = logging.INFO, file_level: int = logging.DEBUG) -> logging.Logger:
     """
     Fonction permettant de configurer le logging en fonction du niveau de debug.
+    Les logs DEBUG sont réservés au fichier, pas à la console.
 
     :param filename (str): Nom du fichier.
     :param console_level (int): Niveau de debug dans la console.
@@ -15,8 +13,9 @@ def config_logging(
     :return (Logger): Function de logging.
     """
 
-    logger = logging.getLogger(__name__)
+    logger = logging.getLogger("factory")
     logger.setLevel(logging.DEBUG)
+    logger.propagate = False
 
     formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     

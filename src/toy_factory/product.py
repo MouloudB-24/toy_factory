@@ -27,20 +27,15 @@ class Product:
         self._id = f"TOY-{Product.SERIAL_NUMBER:03d}-{self._product_color.upper()}"
         self._history: List[Dict] = []
         
-        self.logger.info(f"Creation du produit {self._id}.")
+        self.logger.info(f"Produit {self._id} créé")
 
     def __str__(self) -> str:
         return f"{self._id} (Status: {self._status} - Production-time: {self._production_time}s)"
     
     def __repr__(self) -> str:
-        return f"Product(id={self._id}, status={self._status}, Production-time={self._production_time})"
+        return f"Product(id={self._id}, status={self._status})"
     
-    def _update_production_time(self, duration: float) -> float:
-        """Mettre à jour le temps total de production"""
-        self._production_time += duration
-        return self._production_time
-    
-    def get_status(self) -> None:
+    def get_status(self) -> str:
         return self._status
     
     def get_id(self) -> str:
@@ -57,28 +52,31 @@ class Product:
     def get_retry_count(self) -> int:
         return self.retry_count
     
+    def get_production_time(self) -> float:
+        return round(self._production_time, 2)
+    
+    def _update_production_time(self, duration: float) -> float:
+        """Mettre à jour le temps total de production"""
+        self._production_time += duration
+        return self._production_time
+    
     def validate_id(self) -> bool:
         return re.match(r"TOY-\d{3}-[A-Z]+", self._id) is not None
     
     def increment_retry(self) -> None:
         self.retry_count += 1
-        self.logger.debug(f"Produit {self.get_id()} - Tentatives = {self.retry_count}")
     
     def mark_in_progress(self) -> None:
         self._status = Product.STATUS_IN_PROGRESS
-        self.logger.info(f"Produit {self._id} en cours de traitement.")
         
     def mark_defective(self) -> None:
         self._status = Product.STATUS_IN_DEFECTIVE
-        self.logger.warning(f"Produit {self._id} marqué comme déféctueux.")
     
     def mark_finished(self) -> None:
         self._status = Product.STATUS_IN_FINISHED
-        self.logger.info(f"Produit {self._id} marqué comme fini en {self._production_time}s")
     
     def mark_rejected(self) -> None:
         self._status = Product.STATUS_REJECTED
-        self.logger.error(f"Produit {self.get_id()} rejecté après {self.get_retry_count()} tentatives.")
     
     def add_production_step(self, station_name: str, duration: float) -> None:
         """Ajoute une étape de production à l"historique"""
@@ -89,34 +87,9 @@ class Product:
         }
         self._history.append(step)
         self._update_production_time(duration)
-        self.logger.info(f"Produit {self._id} a terminé l'étape '{station_name}' en {duration}s.")
+        self.logger.debug(f"Produit {self._id} : étape {station_name} terminée (durée : {duration}s)")
 
 
 if __name__ == "__main__":
-    from utils.logger import config_logging
-    
-    logger = config_logging()
-    print("Initialisation du produit :")
-    p1 = Product(logger)
-    print("\nAffichger pour l'utilisateur via la méthode __str__ :")
-    print(p1)
-    print("\nAffichger pour le développeur via la méthode __repr__ :")
-    print(p1.__repr__())
-    print(f"\nDetails du produit :")
-    print("     Status :", p1.get_status())
-    print("     ID :", p1.get_id())
-    print("     Numéro de série :", p1.get_serial_number())
-    print("     Historique :", p1.get_history())
-    print("     Format de l'ID ? :", p1.validate_id())
-    print("\nProduit en cours de traitement :")
-    p1.mark_in_progress()
-    print("\nProduit déféctueux :")
-    p1.mark_defective()
-    print("\nProduit fini :")
-    p1.mark_finished()
-    print("\nStations :")
-    p1.add_production_step("Assemblage", 2.3)
-    p1.add_production_step("Peinture", 2.3)
-    print("\nHistorique :" )
-    print(p1.get_history())
+    pass
     
