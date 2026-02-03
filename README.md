@@ -4,7 +4,7 @@
   <img src="https://img.shields.io/badge/Simulation-Industrial-orange" />
 </p>
 
-🚀 **Live demo** : https://<ton-app>.streamlit.app
+🚀 **Live demo** : https://toyfactory.streamlit.app/
 
 
 # Toy Factory - Simulation de production industrielle

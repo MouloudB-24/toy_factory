@@ -1,10 +1,13 @@
 import streamlit as st 
 import time
+import sys
 
 from src.toy_factory.factory import Factory
 from src.toy_factory.product import Product
 from src.utils.logger import config_logging
 
+
+sys.path.append(".")
 
 if "factory" not in st.session_state:
     st.session_state.factory = None
